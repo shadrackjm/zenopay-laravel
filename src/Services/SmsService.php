@@ -26,8 +26,8 @@ class SmsService
         string $senderId,
         string $type = self::TYPE_ALERT,
     ): SmsResponse {
-        $response = $this->client->post('sms/send/', [
-            'recipient'    => $recipient,
+        $response = $this->client->post('sms/v1/send/', [
+            'contacts'     => $recipient,
             'message'      => $message,
             'sender_id'    => $senderId,
             'message_type' => $type,
@@ -50,8 +50,8 @@ class SmsService
         string $senderId,
         string $type = self::TYPE_ALERT,
     ): SmsResponse {
-        $response = $this->client->post('sms/bulk/', [
-            'recipients'   => $recipients,
+        $response = $this->client->post('sms/v1/send/', [
+            'contacts'     => $recipients,
             'message'      => $message,
             'sender_id'    => $senderId,
             'message_type' => $type,

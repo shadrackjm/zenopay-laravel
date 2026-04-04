@@ -46,4 +46,22 @@ return [
     |--------------------------------------------------------------------------
     */
     'verify_ssl' => env('ZENOPAY_VERIFY_SSL', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | SMS API Key
+    |--------------------------------------------------------------------------
+    | ZenoPay issues a separate API key for the Bulk SMS service.
+    | If not set, falls back to the main api_key.
+    */
+    'sms_api_key' => env('ZENOPAY_SMS_API_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | SMS Sender ID
+    |--------------------------------------------------------------------------
+    | The sender ID displayed on outgoing SMS messages.
+    | Must be pre-registered with ZenoPay (max 11 characters).
+    */
+    'sms_sender_id' => env('ZENOPAY_SMS_SENDER_ID', 'MED'),
 ];

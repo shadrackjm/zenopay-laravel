@@ -48,7 +48,20 @@ class ZenoPayServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(SmsService::class, function ($app) {
-            return new SmsService($app->make(ZenoPayClient::class));
+            $config = $app['config']['zenopay'];
+
+            // SMS uses its own API key (ZenoPay issues separate keys per product).
+            // Fall back to the main api_key if sms_api_key is not configured.
+            $smsApiKey = $config['sms_api_key'] ?? $config['api_key'];
+
+            $smsClient = new ZenoPayClient(
+                baseUrl:   $config['base_url'],
+                apiKey:    $smsApiKey,
+                timeout:   $config['timeout'],
+                verifySsl: $config['verify_ssl'],
+            );
+
+            return new SmsService($smsClient);
         });
 
         $this->app->singleton(ZenoPay::class, function ($app) {
