@@ -43,7 +43,7 @@ class UtilityPaymentService
     public const UTT          = 'UTT';
     public const SELCOMPAY    = 'SELCOMPAY';
 
-    public function __construct(protected ZenoPayClient $client, protected ?int $walletPin = null) {}
+    public function __construct(protected ZenoPayClient $client, protected int|string|null $walletPin = null) {}
 
     /**
      * Look up a customer before processing payment.
@@ -80,14 +80,16 @@ class UtilityPaymentService
         string $utilityRef,
         int|float $amount,
         string $msisdn,
-        ?int $pin = null,
+        int|string|null $pin = null,
     ): UtilityPaymentResponse {
+        $resolvedPin = $pin ?? $this->walletPin;
+
         $response = $this->client->post('payments/utilitypayment/process/', [
             'transid'     => $transId,
             'utilitycode' => $utilityCode,
             'utilityref'  => $utilityRef,
             'amount'      => $amount,
-            'pin'         => $pin ?? $this->walletPin,
+            'pin'         => $resolvedPin !== null ? (string) $resolvedPin : null,
             'msisdn'      => $msisdn,
         ]);
 
@@ -97,7 +99,7 @@ class UtilityPaymentService
     /**
      * Shorthand: pay electricity (LUKU token).
      */
-    public function payElectricity(string $transId, string $meterNumber, int|float $amount, string $msisdn, ?int $pin = null): UtilityPaymentResponse
+    public function payElectricity(string $transId, string $meterNumber, int|float $amount, string $msisdn, int|string|null $pin = null): UtilityPaymentResponse
     {
         return $this->pay($transId, self::LUKU, $meterNumber, $amount, $msisdn, $pin);
     }

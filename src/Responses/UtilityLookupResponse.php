@@ -15,11 +15,15 @@ class UtilityLookupResponse
 
     public static function fromArray(array $data): self
     {
+        // API returns "result" not "status", and data is an array of objects e.g. [{"name": "ZENO"}]
+        $dataItems = $data['data'] ?? [];
+        $firstItem = is_array($dataItems) && isset($dataItems[0]) ? $dataItems[0] : $dataItems;
+
         return new self(
-            status:       $data['status'] ?? '',
+            status:       $data['result'] ?? $data['status'] ?? '',
             resultCode:   $data['resultcode'] ?? $data['resultCode'] ?? '',
-            customerName: $data['data']['customer_name'] ?? $data['customer_name'] ?? '',
-            utilityRef:   $data['data']['utility_ref'] ?? $data['utility_ref'] ?? '',
+            customerName: $firstItem['name'] ?? $firstItem['customer_name'] ?? $data['customer_name'] ?? '',
+            utilityRef:   $data['reference'] ?? $firstItem['utility_ref'] ?? $data['utility_ref'] ?? '',
             message:      $data['message'] ?? null,
             raw:          $data,
         );
