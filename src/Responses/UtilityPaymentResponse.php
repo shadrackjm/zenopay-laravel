@@ -18,23 +18,26 @@ class UtilityPaymentResponse
 
     public static function fromArray(array $data): self
     {
+        // ZenoPay wraps the Selcom response under 'selcom_response' for utility payments.
+        // The resultcode and token details live there, not at the top level.
+        $selcom  = $data['selcom_response'] ?? [];
         $payload = $data['data'] ?? $data;
 
         return new self(
-            status:        $data['status'] ?? '',
-            resultCode:    $data['resultcode'] ?? $data['resultCode'] ?? '',
-            message:       $data['message'] ?? '',
-            transactionId: $payload['transactionRef'] ?? $payload['transid'] ?? $payload['transaction_id'] ?? null,
-            zreference:    $payload['transactionRef'] ?? $payload['zreference'] ?? null,
+            status:        $data['status'] ?? $selcom['result'] ?? '',
+            resultCode:    $selcom['resultcode'] ?? $data['resultcode'] ?? $data['resultCode'] ?? '',
+            message:       $selcom['message'] ?? $data['message'] ?? '',
+            transactionId: $selcom['transid'] ?? $payload['transactionRef'] ?? $payload['transid'] ?? $payload['transaction_id'] ?? null,
+            zreference:    $selcom['reference'] ?? $payload['transactionRef'] ?? $payload['zreference'] ?? null,
             amount:        $payload['amount'] ?? 0,
             fee:           $payload['fee'] ?? 0,
-            token:         $payload['token'] ?? null,
+            token:         $selcom['token'] ?? $payload['token'] ?? null,
             raw:           $data,
         );
     }
 
     public function isSuccess(): bool
     {
-        return $this->resultCode === '000';
+        return $this->resultCode === '000' || strtolower($this->status) === 'success';
     }
 }
