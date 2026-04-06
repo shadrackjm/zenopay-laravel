@@ -25,7 +25,10 @@ class PaymentResponse
 
     public function isSuccess(): bool
     {
-        return $this->resultCode === '000';
+        // ZenoPay returns '000' normally, but some operator callbacks return '200'.
+        // Both indicate the request was accepted and USSD push was sent.
+        return in_array($this->resultCode, ['000', '200'], true)
+            || strtolower($this->status) === 'success';
     }
 
     public function isPending(): bool
